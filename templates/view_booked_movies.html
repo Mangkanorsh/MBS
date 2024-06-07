@@ -89,7 +89,7 @@
                             <td>{{ booking.total_price }}</td>
                             <td>
                                 <form action="{{ url_for('print_receipt', booking_id=booking.id) }}" method="post" target="_blank">
-                                    <button type="submit" class="btn btn-primary">Print Receipt</button>
+                                    <button type="submit" class="btn btn-warning">Print Receipt</button>
                                 </form>
                             </td>
                         </tr>

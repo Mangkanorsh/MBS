@@ -104,12 +104,12 @@
                     <td>{{ booking.date }}</td>
                     <td>{{ booking.timeslot }}</td>
                     <td>{{ booking.seats }}</td>
-                    <td>{{ booking.total_price }}</td>
+                    <td>₱{{ booking.total_price }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <p>Total Amount: ${{ total_amount }}</p>
+        <p>Total Amount: ₱{{ total_amount }}</p>
 
         <form method="POST">
             <button type="submit">Pay Now</button>
