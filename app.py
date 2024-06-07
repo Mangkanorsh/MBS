@@ -174,7 +174,7 @@ def book_movie(movie_id):
                     (session['id'], movie_id, movie['title'], date, timeslot, ','.join(available_seats), seat_quantity, total_price)
                 )
                 mysql.connection.commit()
-                flash('Booking successful!', 'success')
+                flash('Successfuly added to cart!', 'success')
                 return redirect(url_for('cart', price=total_price))
             else:
                 flash('Selected seats are not available. Please choose other seats.', 'danger')
@@ -240,7 +240,7 @@ def cancel_booking(booking_id):
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('DELETE FROM bookings WHERE id = %s AND user_id = %s', (booking_id, session['id']))
         mysql.connection.commit()
-        flash('Booking canceled successfully!', 'success')
+        flash('Movie removed from cart successfully!', 'success')
         return redirect(url_for('cart'))
     return redirect(url_for('login'))
 
@@ -264,17 +264,8 @@ def checkout():
                     cursor.execute('UPDATE bookings SET status = %s WHERE user_id = %s AND status = %s', ('paid', session['id'], 'unpaid'))
                     mysql.connection.commit()
 
-                    # Generate random transaction ID
-                    transaction_id = str(uuid.uuid4())  # Convert UUID to string
-                    # Render receipt template
-                    receipt_data = {
-                        'transaction_id': transaction_id,
-                        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Current date and time
-                        # Add more data as needed
-                    }
-                    receipt_html = render_template('receipt.html', **receipt_data)
-                    return render_template('checkout.html', receipt_html=receipt_html)
-
+                    flash('Payment successful and bookings updated to paid.', 'success')
+                    return redirect(url_for('view_booked_movies'))
                 else:
                     flash('No unpaid bookings found.', 'danger')
             else:
@@ -316,21 +307,28 @@ def profile():
         if request.method == 'POST':
             email = request.form['email']
             password = request.form['password']
+
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             if password:
                 hashed_password = generate_password_hash(password)
-                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
                 cursor.execute('UPDATE users SET email = %s, password = %s WHERE id = %s', (email, hashed_password, session['id']))
             else:
-                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
                 cursor.execute('UPDATE users SET email = %s WHERE id = %s', (email, session['id']))
+            
             mysql.connection.commit()
+            cursor.close()
+
             flash('Profile updated successfully!', 'success')
             return redirect(url_for('profile'))
+
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM users WHERE id = %s', (session['id'],))
         user = cursor.fetchone()
+        cursor.close()
+
         return render_template('profile.html', user=user)
     return redirect(url_for('login'))
+
 
 @app.route('/logout')
 def logout():

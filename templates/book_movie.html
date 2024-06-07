@@ -44,6 +44,11 @@
             background-color: #2196F3;
             /* Blue for selected seats */
         }
+
+        .warning-message {
+            color: #f44336;
+            display: none;
+        }
     </style>
     <script>
         function selectSeat(button) {
@@ -54,6 +59,21 @@
                 seatInput.value = selectedSeats.join(',');
             }
         }
+
+        function validateForm(event) {
+            const dateInput = document.querySelector('input[name="date"]').value;
+            const timeslotInput = document.querySelector('input[name="timeslot"]:checked');
+            const selectedSeats = document.getElementById('selected_seats').value;
+
+            if (!dateInput || !timeslotInput || !selectedSeats) {
+                event.preventDefault();
+                document.getElementById('warning-message').style.display = 'block';
+                return false;
+            }
+
+            document.getElementById('warning-message').style.display = 'none';
+            return true;
+        }
     </script>
 </head>
 
@@ -63,7 +83,7 @@
     <main class="p-5 mt-5 bg-dark">
         <div class="container">
             <h1>Book Movie: {{ movie['title'] }}</h1>
-            <form method="POST">
+            <form method="POST" onsubmit="validateForm(event)">
                 <div class="mb-3">
                     <label class="mb-1" for="date">Date:</label>
                     <input type="date" name="date" class="form-control" required>
@@ -101,7 +121,12 @@
                 </div>
 
                 <input type="hidden" name="seats" id="selected_seats">
-                <button type="submit" class="btn btn-warning w-25">Book</button>
+                <div id="warning-message" class="warning-message mb-3 text-center">Please select a date, a timeslot, and
+                    at least one seat.</div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-warning btn-lg w-75">Book</button>
+                </div>
+
             </form>
         </div>
     </main>
